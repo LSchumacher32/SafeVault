@@ -1,0 +1,132 @@
+@page
+@model SafeVault.Pages.SafeInputModel
+@{
+    ViewData["Title"] = "Safe Input Exercise";
+}
+
+<div class="container mt-5">
+    <h1>Safe Input Exercise</h1>
+    <p class="text-muted">Training: Server-side validation with InputValidationService and DemoUserRepository</p>
+
+    <hr />
+
+    <!-- Save Section -->
+    <div class="row mb-5">
+        <div class="col-md-6">
+            <h3>Add New Demo User</h3>
+
+            @if (!string.IsNullOrEmpty(Model.ValidationError))
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    @Model.ValidationError
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    @Model.SuccessMessage
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            <form method="post" action="/SafeInput">
+                @Html.AntiForgeryToken()
+
+                <div class="mb-3">
+                    <label for="username" class="form-label">Username</label>
+                    <input type="text" class="form-control" id="username" name="username" placeholder="3-100 characters, letters, digits, underscore, hyphen" required />
+                    <small class="form-text text-muted">3-100 characters. Only letters (A-Z, a-z), digits (0-9), underscore (_), and hyphen (-) allowed.</small>
+                </div>
+
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="email" name="email" placeholder="example@domain.com" required />
+                    <small class="form-text text-muted">Maximum 100 characters. Valid email format required.</small>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Save</button>
+            </form>
+        </div>
+    </div>
+
+    <hr />
+
+    <!-- Search Section -->
+    <div class="row">
+        <div class="col-md-6">
+            <h3>Search Demo User by Username</h3>
+
+            @if (!string.IsNullOrEmpty(Model.SearchError))
+            {
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    @Model.SearchError
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            <form method="post" action="/SafeInput?handler=Search">
+                @Html.AntiForgeryToken()
+
+                <div class="mb-3">
+                    <label for="searchUsername" class="form-label">Username to Search</label>
+                    <input type="text" class="form-control" id="searchUsername" name="searchUsername" placeholder="Enter exact username" required />
+                </div>
+
+                <button type="submit" class="btn btn-secondary">Search</button>
+            </form>
+
+            @if (Model.SearchResult != null)
+            {
+                <div class="mt-4">
+                    <div class="alert alert-info">
+                        <h5>Search Result</h5>
+                        <table class="table table-sm">
+                            <tbody>
+                                <tr>
+                                    <th>ID</th>
+                                    <td>@Model.SearchResult.Id</td>
+                                </tr>
+                                <tr>
+                                    <th>Username</th>
+                                    <td>@Model.SearchResult.Username</td>
+                                </tr>
+                                <tr>
+                                    <th>Email</th>
+                                    <td>@Model.SearchResult.Email</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+            else if (Model.SearchPerformed && Model.SearchResult == null)
+            {
+                <div class="alert alert-info mt-4">
+                    No demo user found with the specified username.
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+    body {
+        background-color: #f8f9fa;
+    }
+    .container {
+        background-color: white;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+        color: #333;
+        margin-bottom: 0.5rem;
+    }
+    h3 {
+        color: #555;
+        margin-top: 1.5rem;
+    }
+</style>
